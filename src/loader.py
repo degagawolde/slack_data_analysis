@@ -119,15 +119,13 @@ class SlackDataLoader:
                     else:
                         sender_id.append("Not provided")
                     time_msg.append(row["ts"])
-
+                    print(row)
                     if (
-                        "blocks"
-                        in row.keys()
-                        # and len(row["blocks"][0]["elements"][0]["elements"]) != 0
+                        "blocks" in row.keys()
+                        and len(row["blocks"][0]["elements"][0]["elements"]) != 0
                     ):
                         msg_dist.append(
-                            1
-                            # row["blocks"][0]["elements"][0]["elements"][0]["type"]
+                            row["blocks"][0]["elements"][0]["elements"][0]["type"]
                         )
                     else:
                         msg_dist.append("reshared")
