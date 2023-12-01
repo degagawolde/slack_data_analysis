@@ -119,9 +119,9 @@ class SlackDataLoader:
                     else:
                         sender_id.append("Not provided")
                     time_msg.append(row["ts"])
-                    print(row)
                     if (
                         "blocks" in row.keys()
+                        and row["blocks"] is not None
                         and len(row["blocks"][0]["elements"][0]["elements"]) != 0
                     ):
                         msg_dist.append(
