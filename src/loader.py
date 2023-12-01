@@ -87,14 +87,15 @@ class SlackDataLoader:
         """
 
         # specify path to get json files
+        json_paths = glob.glob(f"{path_channel}/all-week*/*.json")
         combined = []
-        for json_file in glob.glob(f"{path_channel}/all-week*/*.json"):
+        for json_file in json_paths:
             with open(json_file, "r", encoding="utf8") as slack_data:
                 combined.append(json.load(slack_data))
 
         # loop through all json files and extract required informations
         dflist = []
-        for slack_data in combined:
+        for slack_data, jsonpath in zip(combined, json_paths):
             (
                 msg_type,
                 msg_content,
@@ -106,7 +107,8 @@ class SlackDataLoader:
                 reply_count,
                 reply_users_count,
                 tm_thread_end,
-            ) = ([], [], [], [], [], [], [], [], [], [])
+                channel,
+            ) = ([], [], [], [], [], [], [], [], [], [], [])
 
             for row in slack_data:
                 if "bot_id" in row.keys():
@@ -145,6 +147,7 @@ class SlackDataLoader:
                         reply_count.append(0)
                         reply_users_count.append(0)
                         tm_thread_end.append(0)
+            channel.append(jsonpath.split("/")[-2])
             data = zip(
                 msg_type,
                 msg_content,
@@ -156,6 +159,7 @@ class SlackDataLoader:
                 reply_users_count,
                 reply_users,
                 tm_thread_end,
+                channel,
             )
             columns = [
                 "msg_type",
@@ -168,6 +172,7 @@ class SlackDataLoader:
                 "reply_users_count",
                 "reply_users",
                 "tm_thread_end",
+                "channel",
             ]
 
             df = pd.DataFrame(data=data, columns=columns)
@@ -175,7 +180,6 @@ class SlackDataLoader:
             dflist.append(df)
 
         dfall = pd.concat(dflist, ignore_index=True)
-        dfall["channel"] = path_channel.split("/")[-1].split(".")[0]
         dfall = dfall.reset_index(drop=True)
 
         return dfall
